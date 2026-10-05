@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canteen Order & Billing Management System - Technical Case Study & Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #ea580c;
+      --primary-light: #f97316;
+      --primary-dark: #9a3412;
+      --accent: #f59e0b;
+      --bg: #0c0a09;
+      --surface: #1c1917;
+      --surface-card: #292524;
+      --surface-border: #44403c;
+      --text-main: #f5f5f4;
+      --text-muted: #a8a29e;
+      --success: #10b981;
+      --code-bg: #171412;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.75;
+      padding: 0;
+    }
+    header.hero {
+      background: linear-gradient(135deg, rgba(234, 88, 12, 0.18) 0%, rgba(245, 158, 11, 0.12) 100%), var(--surface);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .badge-bar {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-primary { background: rgba(234, 88, 12, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .badge-accent { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #ffffff, #e7e5e4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 750px;
+      margin: 0 auto 2rem auto;
+    }
+    .meta-box {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .meta-box span strong { color: var(--text-main); }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    .blog-nav {
+      position: sticky;
+      top: 1rem;
+      z-index: 100;
+      background: rgba(28, 25, 23, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      margin-bottom: 2.5rem;
+    }
+    .blog-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .blog-nav a:hover {
+      color: var(--primary-light);
+    }
+    section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 5rem;
+    }
+    h2 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 2px solid var(--surface-border);
+      padding-bottom: 0.5rem;
+    }
+    h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #f5f5f4;
+      margin: 1.75rem 0 0.75rem 0;
+    }
+    p {
+      color: #d6d3d1;
+      margin-bottom: 1.25rem;
+      font-size: 1.025rem;
+    }
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin: 1.5rem 0;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .feature-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary-light);
+    }
+    .feature-card h4 {
+      color: #fb923c;
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #e7e5e4;
+      margin: 1.25rem 0;
+    }
+    code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: #fb923c;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: var(--surface-card);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--surface-border);
+    }
+    th, td {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    th {
+      background: rgba(255, 255, 255, 0.04);
+      color: #fafaf9;
+      font-weight: 600;
+    }
+    td {
+      color: #d6d3d1;
+      font-size: 0.95rem;
+    }
+    .flow-diagram {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .flow-step {
+      display: inline-block;
+      background: rgba(234, 88, 12, 0.15);
+      border: 1px solid var(--primary-light);
+      padding: 0.85rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #fed7aa;
+      margin: 0.5rem;
+    }
+    .flow-arrow {
+      color: var(--accent);
+      font-size: 1.25rem;
+      margin: 0 0.25rem;
+    }
+    footer {
+      border-top: 1px solid var(--surface-border);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      background: var(--surface);
+    }
+    footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="badge-bar">
+      <span class="badge badge-primary">Student Project</span>
+      <span class="badge badge-accent">Python 3.14</span>
+      <span class="badge badge-success">Automated Tax & Reports</span>
+    </div>
+    <h1>Canteen Order & Billing Management System</h1>
+    <p class="subtitle">An architectural analysis and implementation review of a terminal-based POS, menu catalog manager, and statutory tax-inclusive billing engine.</p>
+    <div class="meta-box">
+      <span>Developer: <strong>Shreayan</strong></span>
+      <span>Course Mapping: <strong>CO1, CO3, CO4</strong></span>
+      <span>Program Mapping: <strong>PO1, PO2, PO3, PO5</strong></span>
+      <span>Repository: <a href="https://github.com/Bhanu-teja-VCE/python-course-end-project-shreayan" target="_blank" style="color:var(--primary-light); text-decoration: none;"><strong>python-course-end-project-shreayan</strong></a></span>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav class="blog-nav">
+      <a href="#overview">1. Overview</a>
+      <a href="#architecture">2. Architecture</a>
+      <a href="#features">3. Core Features</a>
+      <a href="#logic">4. Underlying Logic</a>
+      <a href="#persistence">5. Data Model</a>
+      <a href="#walkthrough">6. Code Walkthrough</a>
+      <a href="#execution">7. How to Run</a>
+      <a href="#attainment">8. CO/PO Mapping</a>
+    </nav>
+
+    <!-- SECTION 1 -->
+    <section id="overview">
+      <h2>1. Problem Statement & Project Overview</h2>
+      <p>
+        Campus cafeterias and quick-service diners frequently experience peak-hour bottlenecks during breakfast and lunch service. Manual paper tokens result in slow checkout queues, calculation discrepancies, untracked stock modifications, and inaccurate daily revenue reconciliation.
+      </p>
+      <p>
+        The <strong>Canteen Order and Billing Management System</strong> was designed and developed by Shreayan to computerise point-of-sale operations. Built entirely with Python's standard library, the application maintains dynamic food catalogs, provides interactive multi-item order cart compilation, automatically enforces a 5% GST computation, prints formatted point-of-sale invoices, and archives every transaction for date-filtered sales audits.
+      </p>
+      <div class="grid-2">
+        <div class="feature-card">
+          <h4>Dynamic Menu Code Generation</h4>
+          <p>Utilizes auto-incrementing key discovery <code>max([int(c) ...]) + 1</code> to prevent identifier collisions when food offerings expand.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Interactive Cart Assembly</h4>
+          <p>Facilitates arbitrary multi-item ordering within a single checkout session with validation checks against negative or non-integer quantities.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section id="architecture">
+      <h2>2. System Architecture & Workflow</h2>
+      <p>
+        The software follows a functional controller design backed by a single-file JSON database containing two distinct schemas: a <code>menu</code> map and an <code>orders</code> collection.
+      </p>
+
+      <div class="flow-diagram">
+        <div class="flow-step">Menu & Cart Input</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Quantity & Price Validator</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">5% GST & Subtotal Math</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Order Ledger Persistence</div>
+      </div>
+
+      <div class="card">
+        <h3>Operational Cycle:</h3>
+        <ol style="margin-left: 1.5rem; color: #d6d3d1;">
+          <li style="margin-bottom: 0.5rem;"><strong>Bootstrap:</strong> If <code>canteen_data.json</code> does not exist, a default starter menu (Idli, Dosa, Veg Meals, Tea, Coffee) is pre-populated automatically.</li>
+          <li style="margin-bottom: 0.5rem;"><strong>Cart Loop:</strong> Customer specifies items by numerical code. Quantities are validated (<code>qty &gt; 0</code>), appending items to an in-memory cart list until the keyword <code>done</code> is entered.</li>
+          <li style="margin-bottom: 0.5rem;"><strong>Taxation & Invoicing:</strong> Computes item subtotal, applies 5% GST via <code>round(subtotal * 0.05, 2)</code>, prints an itemized bill, and records the sale timestamped with the current date.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section id="features">
+      <h2>3. Feature Breakdown</h2>
+      <div class="grid-2">
+        <div class="feature-card">
+          <h4>1. Interactive Food Menu</h4>
+          <p>Tabular formatting displays item code, dish name left-aligned (<code>{item['name']:&lt;15}</code>), and price in Indian Rupees.</p>
+        </div>
+        <div class="feature-card">
+          <h4>2. Catalog Modification</h4>
+          <p>Add new dishes with auto-generated incremental IDs; delete existing dishes using <code>menu.pop(code)</code> safely.</p>
+        </div>
+        <div class="feature-card">
+          <h4>3. Multi-Item Order Billing</h4>
+          <p>Assembles custom customer carts, validates item existence, prevents zero/negative quantities, and issues formatted receipts.</p>
+        </div>
+        <div class="feature-card">
+          <h4>4. Daily Date-Filtered Sales Reports</h4>
+          <p>Query sales for any specified date (<code>YYYY-MM-DD</code>) or press Enter to aggregate today's order count and gross revenue.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section id="logic">
+      <h2>4. Algorithmic Deep Dive & Underlying Logic</h2>
+
+      <h3>A. Auto-Incrementing Code Generator</h3>
+      <p>
+        When adding items, rather than relying on an external counter that could become desynchronized upon deletions, the system evaluates all existing numeric string keys:
+      </p>
+      <pre><code># Extracts all integer keys, defaults to 0 if empty, and increments by 1
+new_code = str(max([int(c) for c in data["menu"]] + [0]) + 1)
+data["menu"][new_code] = {"name": name, "price": price}
+save_data(data)</code></pre>
+      <p>This guarantees monotonic code generation even if items 2 or 3 are deleted.</p>
+
+      <h3>B. Financial & Tax Arithmetic</h3>
+      <p>
+        The checkout algorithm computes sum of products, applies GST, and rounds to 2 decimal places to avoid floating point representation anomalies:
+      </p>
+      <pre><code>subtotal = sum(i["price"] * i["qty"] for i in cart)
+gst = round(subtotal * 0.05, 2)
+total = round(subtotal + gst, 2)</code></pre>
+
+      <h3>C. List Comprehension Date Filter</h3>
+      <p>
+        Daily audits are executed in-memory through clean, idiomatic Python list comprehensions:
+      </p>
+      <pre><code>orders = [o for o in data["orders"] if o["date"] == date]
+total_sales = round(sum(o["total"] for o in orders), 2)</code></pre>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section id="persistence">
+      <h2>5. Data Model & Storage Schema</h2>
+      <p>
+        The database format is stored in <code>canteen_data.json</code>:
+      </p>
+      <pre><code>{
+    "menu": {
+        "1": { "name": "Idli", "price": 30.0 },
+        "2": { "name": "Dosa", "price": 40.0 },
+        "3": { "name": "Veg Meals", "price": 80.0 },
+        "4": { "name": "Tea", "price": 10.0 },
+        "5": { "name": "Coffee", "price": 15.0 },
+        "6": { "name": "Samosa", "price": 20.0 }
+    },
+    "orders": [
+        {
+            "customer": "Kavitha",
+            "date": "2026-10-05",
+            "items": [
+                { "name": "Dosa", "price": 40.0, "qty": 2 },
+                { "name": "Coffee", "price": 15.0, "qty": 1 }
+            ],
+            "total": 99.75
+        }
+    ]
+}</code></pre>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section id="walkthrough">
+      <h2>6. Comprehensive Code Walkthrough</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>Parameters</th>
+            <th>Primary Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>load_data()</code></td>
+            <td>None</td>
+            <td>Loads <code>canteen_data.json</code> or initializes default starter menu.</td>
+          </tr>
+          <tr>
+            <td><code>save_data(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Flushes the current in-memory data dictionary to disk.</td>
+          </tr>
+          <tr>
+            <td><code>show_menu(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Formats and renders menu items with fixed-width column alignment.</td>
+          </tr>
+          <tr>
+            <td><code>add_item(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Validates food name & float price, assigns auto-code, updates database.</td>
+          </tr>
+          <tr>
+            <td><code>remove_item(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Safely removes an item by code using <code>pop()</code> with feedback.</td>
+          </tr>
+          <tr>
+            <td><code>place_order(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Multi-item cart loop, 5% GST computation, terminal receipt, order recording.</td>
+          </tr>
+          <tr>
+            <td><code>daily_sales(data)</code></td>
+            <td><code>data: dict</code></td>
+            <td>Filters order history by user-supplied or current date, computing revenue.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 7 -->
+    <section id="execution">
+      <h2>7. How to Run & CLI Demo</h2>
+      <pre><code># 1. Clone or navigate to the directory
+cd 2_Shreayan_Canteen_Billing
+
+# 2. Execute the system
+python canteen_system.py</code></pre>
+
+      <div class="card">
+        <h3>Sample Terminal Interaction:</h3>
+        <pre><code>===== CANTEEN ORDER & BILLING SYSTEM =====
+1. Show menu
+2. Add food item
+3. Remove food item
+4. Place order & generate bill
+5. Daily sales report
+6. Exit
+Enter choice: 4
+Enter customer name: Rohan
+--- Food Menu ---
+1. Idli            Rs. 30
+2. Dosa            Rs. 40
+3. Veg Meals       Rs. 80
+4. Tea             Rs. 10
+5. Coffee          Rs. 15
+Enter item code (or 'done' to finish): 2
+Enter quantity: 2
+Added 2 x Dosa
+Enter item code (or 'done' to finish): 4
+Enter quantity: 1
+Added 1 x Tea
+Enter item code (or 'done' to finish): done
+
+========== BILL ==========
+Customer: Rohan
+Date    : 2026-10-05 15:30
+--------------------------
+Dosa         2 x 40 = 80
+Tea          1 x 10 = 10
+--------------------------
+Subtotal : Rs. 90
+GST (5%) : Rs. 4.5
+TOTAL    : Rs. 94.5
+==========================</code></pre>
+      </div>
+    </section>
+
+    <!-- SECTION 8 -->
+    <section id="attainment">
+      <h2>8. Academic CO & PO Attainment Matrix</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Outcome</th>
+            <th>Description & Application in this Project</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CO1</strong></td>
+            <td>Knowledge of variables, operators, loops, and conditional control flow. Applied across continuous CLI loop and cart accumulation logic.</td>
+          </tr>
+          <tr>
+            <td><strong>CO3</strong></td>
+            <td>Application of complex nested collections (dictionaries containing lists of nested dictionaries). Demonstrated in order and menu hierarchies.</td>
+          </tr>
+          <tr>
+            <td><strong>CO4</strong></td>
+            <td>Exception handling and defensive programming. Handled using <code>try-except ValueError</code> blocks during price and quantity parsing.</td>
+          </tr>
+          <tr>
+            <td><strong>PO1, PO2</strong></td>
+            <td>Engineering knowledge & Problem analysis: Formulation of commercial canteen billing pipelines including statutory tax computation.</td>
+          </tr>
+          <tr>
+            <td><strong>PO3, PO5</strong></td>
+            <td>Design/Development of solutions & Modern tool usage: Development of a fully self-contained POS utility without external dependencies.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>Canteen Order & Billing Management System &bull; Developed by <strong>Shreayan</strong></p>
+    <p>Repository: <a href="https://github.com/Bhanu-teja-VCE/python-course-end-project-shreayan" target="_blank">github.com/Bhanu-teja-VCE/python-course-end-project-shreayan</a></p>
+  </footer>
+
+</body>
+</html>
